@@ -1,7 +1,6 @@
 // BetterRM: rm with trash safety
 // author: chance nelson
 // TODO: removing folders
-//       better support for removing binary files
 
 
 #include <stdio.h>
@@ -20,7 +19,7 @@
 // argv: arg list
 bool check_args(int argc, char** argv) {
     for(int i = 1; i < argc; i++) {
-        // check to see if each file exists
+        // check to see if each file existsw
         FILE *file = fopen(argv[i], "r");
         if(file == NULL) {
             fclose(file);
@@ -52,34 +51,42 @@ int main(int argc, char** argv) {
 
     // loop through each file, copy it to the home trash folder, and unlink the original version
     for(int i = 1; i < argc; i++) {
-        FILE *original = fopen(argv[i], "r");
+        FILE *original = fopen(argv[i], "rb");
 
+	struct stat fileStat;
+	stat(argv[i], &fileStat);
+	int size = fileStat.st_size;
+	
+        printf("happenes after here");
+        
         // set up string that describes the path to a trash folder in /home/$USER
-        char *backupPath = malloc(strlen(homeDir) + strlen(argv[i]) + strlen("/trash/")); 
+        char *backupPath = malloc(strlen(homeDir) + strlen(argv[i]) + strlen("/trash/") + sizeof('\0')); 
         strcpy(backupPath, homeDir);
         strcat(backupPath, "/trash/");
-
+        
         // find out if the trash folder exists or not
         // if it doesnt, create it
         // TODO: different trash folder locations? maybe user specified optionally
-        struct stat st = {0};
-        if(stat(backupPath, &st) == -1) {
+        if(stat(backupPath, &fileStat) == -1) {
             mkdir(backupPath, 0700);
 
         }
 
         strcat(backupPath, argv[i]);
+        
+        printf("%s", backupPath);
 
         // create backup file
         FILE *backup = fopen(backupPath, "w");
 
-        // copy original file contents to the backup area
-        char c = fgetc(original);
-        while(c != EOF) {
-            fputc(c, backup);
-            c = fgetc(original);
+        // copy originwal file contents to the backup area
+        unsigned char buffer[1024];
+	for(int i = 0; i < size; i++) {
+	    fread(buffer, 1, 1, original);
+	    fwrite(buffer, 1, 1, backup);
+	  
+	}
 
-        }
 
         // unlink original file (spooky part)
         remove(argv[i]);
