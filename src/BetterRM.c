@@ -19,7 +19,7 @@
 // argv: arg list
 bool check_args(int argc, char** argv) {
     for(int i = 1; i < argc; i++) {
-        // check to see if each file existsw
+        // check to see if each file exists
         FILE *file = fopen(argv[i], "r");
         if(file == NULL) {
             fclose(file);
@@ -57,7 +57,6 @@ int main(int argc, char** argv) {
 	stat(argv[i], &fileStat);
 	int size = fileStat.st_size;
 	
-        printf("happenes after here");
         
         // set up string that describes the path to a trash folder in /home/$USER
         char *backupPath = malloc(strlen(homeDir) + strlen(argv[i]) + strlen("/trash/") + sizeof('\0')); 
@@ -74,7 +73,6 @@ int main(int argc, char** argv) {
 
         strcat(backupPath, argv[i]);
         
-        printf("%s", backupPath);
 
         // create backup file
         FILE *backup = fopen(backupPath, "w");
@@ -86,7 +84,6 @@ int main(int argc, char** argv) {
 	    fwrite(buffer, 1, 1, backup);
 	  
 	}
-
 
         // unlink original file (spooky part)
         remove(argv[i]);
