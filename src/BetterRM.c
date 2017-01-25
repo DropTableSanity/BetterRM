@@ -18,6 +18,10 @@
 // argc: arg count
 // argv: arg list
 bool check_args(int argc, char** argv) {
+    if(argc < 2) return false;
+    
+    if(argv[1] == "--help" || argv[1] == "-h") return false;
+    
     for(int i = 1; i < argc; i++) {
         // check to see if each file exists
         FILE *file = fopen(argv[i], "r");
@@ -41,7 +45,7 @@ int main(int argc, char** argv) {
     // if args not valid, print a description
     if(!check_args(argc, argv)) {
         printf("BetterRM - so you dont go batshit crazy when you accidentaly delete important stuff\n");
-        printf("Usage: brm file1 file2 ... filen");
+        printf("Usage: brm file1 file2 ... filen\n");
 
     }
 
